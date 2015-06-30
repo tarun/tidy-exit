@@ -33,7 +33,7 @@ Successfully finish processing in-progress requests before shutting down instead
 
 
 # Inspiration & References
-[https://github.com/mathrawka/express-tidy-exit]()
+[https://github.com/mathrawka/express-graceful-exit]()
 
 [http://glynnbird.tumblr.com/post/54739664725/graceful-server-shutdown-with-node-js-and-express]()
 
