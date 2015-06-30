@@ -1,0 +1,12 @@
+{
+    "opts" : {
+        "destination" : "./docs/",
+        "readme" : "./README.md",
+        "recurse" : true,
+        "private" : true
+    },
+    "source" : {
+        "include" : [ "./" ],
+        "exclude" : [ "./node_modules/" ]
+    }
+}

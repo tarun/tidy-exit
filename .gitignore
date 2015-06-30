@@ -1,0 +1,5 @@
+*.sublime-workspace
+/build
+/coverage
+/docs
+/node_modules
