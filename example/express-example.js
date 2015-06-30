@@ -21,7 +21,7 @@ var server = http.createServer(app);
 tidy_exit.hookHttpServer(server);
 server.listen(port, ip);
 
-tidy_exit.addtidyExitHandler(function(err, done) {
+tidy_exit.addTidyExitHandler(function(err, done) {
     console.log('Shutting down');
     done();
 });

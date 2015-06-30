@@ -20,7 +20,7 @@ Successfully finish processing in-progress requests before shutting down instead
 
     var tidy_exit = require('tidy-exit');
 
-    tidy_exit.addtidyExitHandler(function(err, done) {
+    tidy_exit.addTidyExitHandler(function(err, done) {
         console.log('Shutting down');
         done();
     });

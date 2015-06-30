@@ -37,7 +37,7 @@ describe('tidy-exit', function () {
     // ------------------------------------------------------------
     describe('api signature check', function() {
         it('should check if api methods exist', function() {
-            var API_METHODS = ['addtidyExitHandler', 'hookHttpServer', 'hookExpressApp', 'setMaxTimeout', 'getTimeout', 'setLogger', '_reset'];
+            var API_METHODS = ['addTidyExitHandler', 'hookHttpServer', 'hookExpressApp', 'setMaxTimeout', 'getTimeout', 'setLogger', '_reset'];
             API_METHODS.forEach(function(functionName) {
                 expect(tidy_exit).to.exist;
                 assert.isFunction(tidy_exit[functionName], '"' + functionName + '" should be function on tidy_exit module exports/api.');
@@ -71,7 +71,7 @@ describe('tidy-exit', function () {
 
             it('should exit on shutdown message', function(done) {
                 mock_process.expects('exit').once().withArgs(0);
-                tidy_exit.addtidyExitHandler(buildTestExitHandler(done));
+                tidy_exit.addTidyExitHandler(buildTestExitHandler(done));
 
                 process.emit(signal, event_info.validArg);
             });
@@ -84,7 +84,7 @@ describe('tidy-exit', function () {
                     mock_process.verify();
                     done();
                 }, 200);
-                tidy_exit.addtidyExitHandler(handler, 'test', 100);
+                tidy_exit.addTidyExitHandler(handler, 'test', 100);
 
                 process.emit(event_info.invalidSignal, event_info.invalidArg);
             });
@@ -94,7 +94,7 @@ describe('tidy-exit', function () {
 
                 mock_process.expects('exit').once().withArgs(1);
 
-                tidy_exit.addtidyExitHandler(handler, 'test no callback', 100);
+                tidy_exit.addTidyExitHandler(handler, 'test no callback', 100);
                 process.emit(signal, event_info.validArg);
 
                 setTimeout(function() {
@@ -127,14 +127,14 @@ describe('tidy-exit', function () {
 
         it('should use handler timeouts when specified', function() {
             var handler_timeout = 322;
-            tidy_exit.addtidyExitHandler(null, null, handler_timeout);
+            tidy_exit.addTidyExitHandler(null, null, handler_timeout);
             expect(tidy_exit.getTimeout()).to.equal(handler_timeout);
         });
 
         it('should use handler timeouts when specified, even if max timeout is set', function() {
             var max_timeout = 1231;
             var handler_timeout = 322;
-            tidy_exit.addtidyExitHandler(null, null, handler_timeout);
+            tidy_exit.addTidyExitHandler(null, null, handler_timeout);
             tidy_exit.setMaxTimeout(max_timeout);
             expect(tidy_exit.getTimeout()).to.equal(handler_timeout);
         });
@@ -143,7 +143,7 @@ describe('tidy-exit', function () {
             var max_timeout = 1231;
             var handler_timeout = 322;
             tidy_exit.setMaxTimeout(max_timeout);
-            tidy_exit.addtidyExitHandler(null, null, handler_timeout);
+            tidy_exit.addTidyExitHandler(null, null, handler_timeout);
             expect(tidy_exit.getTimeout()).to.equal(handler_timeout);
 
             tidy_exit.setMaxTimeout(null);
@@ -153,7 +153,7 @@ describe('tidy-exit', function () {
         it('should use max timeout if specified - if handler timeouts are larger then max timeout', function() {
             var max_timeout = 1231;
             var handler_timeout = max_timeout * 2;
-            tidy_exit.addtidyExitHandler(null, null, handler_timeout);
+            tidy_exit.addTidyExitHandler(null, null, handler_timeout);
             tidy_exit.setMaxTimeout(max_timeout);
             expect(tidy_exit.getTimeout()).to.equal(max_timeout);
         });
@@ -162,7 +162,7 @@ describe('tidy-exit', function () {
             var max_timeout = 1231;
             var handler_timeout = max_timeout * 2;
             tidy_exit.setMaxTimeout(max_timeout);
-            tidy_exit.addtidyExitHandler(null, null, handler_timeout);
+            tidy_exit.addTidyExitHandler(null, null, handler_timeout);
             expect(tidy_exit.getTimeout()).to.equal(max_timeout);
         });
     });
@@ -180,7 +180,7 @@ describe('tidy-exit', function () {
         it('should exit on set max timeout', function(done) {
             var spy = sinon_sandbox.spy();
             tidy_exit.setMaxTimeout(200);
-            tidy_exit.addtidyExitHandler(spy, 'test max timeout', 1000);
+            tidy_exit.addTidyExitHandler(spy, 'test max timeout', 1000);
             expect(tidy_exit.getTimeout()).to.equal(200);
 
             setTimeout(function() {
@@ -196,7 +196,7 @@ describe('tidy-exit', function () {
             var override_timeout = 1000;
             var spy = sinon_sandbox.spy();
 
-            tidy_exit.addtidyExitHandler(spy, 'test max timeout', override_timeout);
+            tidy_exit.addTidyExitHandler(spy, 'test max timeout', override_timeout);
             expect(tidy_exit.getTimeout()).to.equal(override_timeout);
 
             setTimeout(function() {
@@ -215,7 +215,7 @@ describe('tidy-exit', function () {
 
             expect(default_timeout).to.be.at.least(60 * 1000);
 
-            tidy_exit.addtidyExitHandler(spy, 'test max timeout');
+            tidy_exit.addTidyExitHandler(spy, 'test max timeout');
             setTimeout(function() {
                 expect(spy.called).to.be.true;
                 mock_process.verify();
@@ -233,7 +233,7 @@ describe('tidy-exit', function () {
         it('should print to my custom logger', function(done) {
             var spy = sinon_sandbox.spy();
             tidy_exit.setLogger(spy);
-            tidy_exit.addtidyExitHandler(buildTestExitHandler(function() {
+            tidy_exit.addTidyExitHandler(buildTestExitHandler(function() {
                 expect(spy.called).to.be.true;
                 done();
             }), 'test logger', 100);
@@ -243,7 +243,7 @@ describe('tidy-exit', function () {
 
         it('should print to my custom logger (set after registering handler)', function(done) {
             var spy = sinon_sandbox.spy();
-            tidy_exit.addtidyExitHandler(buildTestExitHandler(function() {
+            tidy_exit.addTidyExitHandler(buildTestExitHandler(function() {
                 expect(spy.called).to.be.true;
                 done();
             }), 'test logger', 100);
