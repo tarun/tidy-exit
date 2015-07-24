@@ -26,10 +26,13 @@ Successfully finish processing in-progress requests before shutting down instead
     });
 
     var app = express();
-    tidy_exit.hookExpressApp(app);
+    var handle = tidy_exit.hookExpressApp(app);
 
     var server = http.createServer(app);
-    tidy_exit.hookHttpServer(server);
+    var handle = tidy_exit.hookHttpServer(server);
+
+    # if intentionally closing app before process shutdown (test cases, etc.)
+    handle.close();
 
 
 # Inspiration & References
