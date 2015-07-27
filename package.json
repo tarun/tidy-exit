@@ -2,18 +2,20 @@
   "name": "tidy-exit",
   "version": "0.2.0",
   "description": "Allow node apps to gracefully exit (allow exisitng requests to finish before shutting down)",
-  "keywords": [
-    "graceful exit",
-    "tidy exit",
-    "shutdown"
-  ],
+  "keywords": [ "graceful exit", "tidy exit", "shutdown" ],
   "author": "Tarun Kothuri <eztarun@gmail.com> (https://github.com/tarun/tidy-exit)",
+
   "repository": {
     "type": "git",
     "url": "https://github.com/tarun/tidy-exit.git"
   },
   "license": "Apache-2.0",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+
   "main": "index.js",
+
   "scripts": {
     "clean": "rm -rf ./build ./docs ./coverage",
     "cover": "istanbul cover _mocha -- test/",
@@ -21,6 +23,7 @@
     "lint": "jshint *.js */*.js",
     "test": "npm run lint && mocha"
   },
+
   "devDependencies": {
     "chai": "^2.0.0",
     "express": "^4.11.2",

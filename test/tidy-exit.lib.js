@@ -104,6 +104,47 @@ describe('tidy-exit', function () {
                 }, 200);
             });
 
+            it('should clear tidyExit handler on calling close', function(done) {
+                var handler = sinon.spy();
+
+                mock_process.expects('exit').never();
+                setTimeout(function() {
+                    expect(handler.called).to.be.false;
+                    mock_process.verify();
+                    done();
+                }, 200);
+
+                var exit_handle = tidy_exit.addTidyExitHandler(handler, 'test no callback', 100);
+                expect(exit_handle).to.exist;
+                assert.isFunction(exit_handle.close);
+                exit_handle.close();
+                process.emit(signal, event_info.validArg);
+            });
+
+            it('should absorb calling tidyExit handler multilpe times', function(done) {
+                var handler = sinon.spy();
+
+                mock_process.expects('exit').never();
+                setTimeout(function() {
+                    exit_handle.close();
+                    expect(handler.called).to.be.false;
+                    mock_process.verify();
+                    done();
+                }, 200);
+
+                var exit_handle = tidy_exit.addTidyExitHandler(handler, 'test no callback', 100);
+                expect(exit_handle).to.exist;
+                assert.isFunction(exit_handle.close);
+
+                // EventEmitter.removeListener() absorbs multiple removes - just testing here, no code in tidy-exit
+                exit_handle.close();
+                exit_handle.close();
+                exit_handle.close();
+
+                process.emit(signal, event_info.validArg);
+            });
+
+
         });
 
     });

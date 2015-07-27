@@ -15,6 +15,7 @@ describe('test http tidyExit', function() {
 
     var handler;
     var request;
+    var exit_handles;
 
     function pExit() {
         process.emit('message', 'shutdown');
@@ -23,7 +24,7 @@ describe('test http tidyExit', function() {
     function createServer(http_handler) {
         handler = http_handler;
         var server = http.createServer(handler);
-        tidy_exit.hookHttpServer(server);
+        exit_handles.push(tidy_exit.hookHttpServer(server));
         request = supertest(server);
         return request;
     }
@@ -57,10 +58,12 @@ describe('test http tidyExit', function() {
     });
     beforeEach(function() {
         mock_process = sinon_sandbox.mock(process);
+        exit_handles = [];
     });
     afterEach(function () {
-       sinon_sandbox.restore(mock_process);
-       tidy_exit._reset(); // This reset must be in the afterEach block. if in the before block - it will leak listeners on mocha repeats tests while watching the file.
+        exit_handles = null;
+        sinon_sandbox.restore(mock_process);
+        tidy_exit._reset(); // This reset must be in the afterEach block. if in the before block - it will leak listeners on mocha repeats tests while watching the file.
     });
     after(function(){
         sinon_sandbox = sinon.sandbox.restore();
@@ -92,10 +95,18 @@ describe('test http tidyExit', function() {
         testServer();
     });
 
+    describe('test removing express tidyExit listener upon close', function() {
+        var app = createExpressApp();
+        var exit_handle = tidy_exit.hookExpressApp(app);
+        expect(exit_handle).to.exist;
+        assert.isFunction(exit_handle.close);
+        exit_handle.close();
+    });
+
     describe('test express tidyExit is last handler', function () {
         beforeEach('prepare express app', function () {
             var app = createExpressApp();
-            tidy_exit.hookExpressApp(app);
+            exit_handles.push(tidy_exit.hookExpressApp(app));
             request = supertest(app);
         });
 
@@ -105,7 +116,7 @@ describe('test http tidyExit', function() {
     describe('test express tidyExit is first handler', function () {
         beforeEach('prepare express app', function () {
             var app = express();
-            tidy_exit.hookExpressApp(app);
+            exit_handles.push(tidy_exit.hookExpressApp(app));
             app = createExpressApp(app);
             request = supertest(app);
         });
@@ -116,7 +127,7 @@ describe('test http tidyExit', function() {
     describe('test express and httpServer tidyExit is last handler and http tidyExit handler is after express', function () {
         beforeEach('prepare express app', function () {
             var app = createExpressApp();
-            tidy_exit.hookExpressApp(app);
+            exit_handles.push(tidy_exit.hookExpressApp(app));
             createServer(app);
         });
 
@@ -126,7 +137,7 @@ describe('test http tidyExit', function() {
     describe('test express and httpServer tidyExit is first handler and http tidyExit handler is after express', function () {
         beforeEach('prepare express app', function () {
             var app = express();
-            tidy_exit.hookExpressApp(app);
+            exit_handles.push(tidy_exit.hookExpressApp(app));
             app = createExpressApp(app);
             createServer(app);
         });
@@ -138,7 +149,7 @@ describe('test http tidyExit', function() {
         beforeEach('prepare express app', function () {
             var app = createExpressApp();
             createServer(app);
-            tidy_exit.hookExpressApp(app);
+            exit_handles.push(tidy_exit.hookExpressApp(app));
         });
 
         testServer();
@@ -147,10 +158,10 @@ describe('test http tidyExit', function() {
     describe('test express and httpServer tidyExit is first handler and http tidyExit handler is before express', function () {
         beforeEach('prepare express app', function () {
             var app = express();
-            tidy_exit.hookExpressApp(app);
+            exit_handles.push(tidy_exit.hookExpressApp(app));
             app = createExpressApp(app);
             createServer(app);
-            tidy_exit.hookExpressApp(app);
+            exit_handles.push(tidy_exit.hookExpressApp(app));
         });
 
         testServer();
@@ -224,6 +235,25 @@ describe('test http tidyExit', function() {
                 expect(tidy_exit_state).to.be.false; // no exit request made yet
             }
         });
+
+        it('should remove exit listeners upon calling handle.close', function(done) {
+            mock_process.expects('exit').never();
+            expect(exit_handles).to.be.not.empty;
+            exit_handles.forEach(function(exit_handle) {
+                if (exit_handle) { // repeated bindings have empty handles
+                    exit_handle.close();
+                }
+            });
+
+            request.get('/testExit/' + 10)
+            .expect('connection', 'close')
+            .expect(200, function() {
+                setTimeout(function() {
+                    mock_process.verify();
+                    done();
+                }, 50);
+            });
+        });
     }
 
 
@@ -254,6 +284,13 @@ describe('test http tidyExit', function() {
             var server = http.createServer(app);
             tidy_exit.hookHttpServer(server, false);
             expect(getExitState()).to.not.exist;
+        });
+
+        it('should not bind app twice', function() {
+            var server = http.createServer(app);
+            tidy_exit.hookHttpServer(server);
+            expect(getExitState()).to.exist;
+            expect(tidy_exit.hookExpressApp(app)).to.be.undefined;
         });
     });
 });
