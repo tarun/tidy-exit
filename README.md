@@ -1,3 +1,5 @@
+[![Circle CI](https://circleci.com/gh/tarun/tidy-exit.svg?style=svg)](https://circleci.com/gh/tarun/tidy-exit)
+
 # Introduction
  NodeJS Tidy Exit - api hooks to detect shutdown and perform cleanup actions for a graceful tidy application exit.
 
