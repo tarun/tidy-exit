@@ -20,7 +20,7 @@
     "clean": "rm -rf ./build ./docs ./coverage",
     "cover": "istanbul cover _mocha -- test/",
     "docs": "jsdoc -c conf/jsdoc.json",
-    "lint": "jshint *.js */*.js",
+    "lint": "jshint --exclude 'node_modules/*' *.js */*.js",
     "test": "npm run lint && mocha"
   },
 
@@ -32,6 +32,6 @@
     "jshint": "2.5.x",
     "mocha": "^2.1.0",
     "sinon": "^1.14.1",
-    "supertest": "^0.15.0"
+    "supertest": "^1.0.1"
   }
 }
